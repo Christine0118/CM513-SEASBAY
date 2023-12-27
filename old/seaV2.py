@@ -69,11 +69,9 @@ def save_user_order_history(username, current_orders):
 
 def login_page():
     # 在登入頁面以對話框的形式顯示用戶消息
-    page = st.sidebar.radio("選擇頁面", ["所有景點","私房遊程" ,"歷史訂單", "景點搜搜搜", "留言板"])
+    page = st.sidebar.radio("選擇頁面", ["所有景點", "歷史訂單", "景點搜搜搜", "留言板"])
     if page == "所有景點":
         popular_attractions()
-    elif page == "私房遊程":
-        private_tours()
     elif page == "歷史訂單":
         order_history()
     elif page == "景點搜搜搜":
@@ -127,6 +125,8 @@ def buy_button(book_index):
                         })
             st.write(f"已將 {books.at[book_index, 'title']} 加入景點搜搜搜")
 
+
+
 # 顯示訂單
 def display_order():
     st.title("訂單明細")
@@ -155,9 +155,6 @@ def shopping_cart_page():
 
         # Display the DataFrame as a table
         st.table(df)
-        if st.button('重選景點'):
-            # Reset the shopping cart (delete the DataFrame)
-            st.session_state.shopping_cart = []
 
         pay = st.button('Google導航')
 
@@ -239,7 +236,8 @@ def popular_attractions():
                     st.image(books.at[i, "image"], caption=books.at[i, "title"], width=300)
                     st.write(f"位置: {books.at[i, 'author']}")
                     st.write(f"類型: {books.at[i, 'genre']}")
-                    buy_button(i)
+                    titlename = books.at[i]
+                    buy_button(titlename)
     else:
         # 根據選擇的地區篩選數據
         filtered_data = books if selected_region == "所有地區" else books[books["author"] == selected_region]
@@ -256,54 +254,7 @@ def popular_attractions():
                 st.write(f"類型: {row['genre']}")
                         # 使用 buy_button 函數處理按鈕邏輯
                 titlename = row['title']
-                if st.button(f"選取 {titlename}", key=f"buy_button_{i}"):
-                    if any(item['景點'] == titlename for item in st.session_state.shopping_cart):
-                        st.warning("此景點已經加入景點搜搜搜")
-                    else:
-                        st.session_state.shopping_cart.append({
-                            "景點": row["title"],
-                            "地區": row["author"],
-                            "類型": row["genre"],  
-                        })
-                        st.write(f"已將 {row['title']} 加入景點搜搜搜")
-
-def private_tours():
-    st.title("私房遊程")
-    st.write("尋找獨特的私房遊程，打造屬於您的旅程！")
-    # 使用 st.container 創建一個容器
-    with st.container():
-    # 在容器內部顯示文字
-    
-
-    # 使用 st.columns 分割容器為三列，分別賦值給 col1, col2, col3
-        col1, col2, col3 = st.columns(3)
-
-    # 在第一列（col1）顯示鹽埕區半日遊的圖片跟簡短介紹
-    with col1:
-        st.header("半日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#鹽埕區#駁二特區")
-        st.markdown("高雄市鹽埕區的駁二特區是充滿藝術與文化魅力的地方。\
-                    這裡也有許多藝術裝置和彩繪壁畫，適合藝術愛好者漫步欣賞。\
-                    鹽埕埔碼頭是個享受海洋氛圍和美食的好地方，可以品嚐新鮮的海鮮小吃。") 
-
-    # 在第二列（col2）顯示三民區半日遊的圖片跟簡短介紹
-    with col2:
-        st.header("半日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#三民區#美食")
-        st.markdown("三民區在高雄是個精彩的旅遊地點，以多樣美食和獨特景點吸引遊客。\
-                    漢神巨蛋是主要地標，還有民族路夜市、大東夜市等美食天堂，提供各式美味小吃。想品味在地特色美食，這裡是最佳選擇。\
-                    在文化和美食上都充滿了活力和驚喜。") 
-
-    # 在第三列（col3）顯示旗津全日遊的圖片跟簡短介紹
-    with col3:
-        st.header("全日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#旗津#渡船遊程")
-        st.markdown("乘坐渡船遊覽旗津是一場美妙的海上冒險。\
-                    從高雄港出發，乘船徜徉在湛藍海岸線上，欣賞著美麗的海景和遠眺港都高樓群，探索當地特色美食、漁港和沙灘。\
-                    最令人難忘的是在海上感受到的清新涼風和放鬆的氛圍，這趟航程將帶給你難忘的海上體驗。 ")
+                buy_button(titlename)
 
 
 def main():

@@ -69,8 +69,12 @@ def save_user_order_history(username, current_orders):
 
 def login_page():
     # 在登入頁面以對話框的形式顯示用戶消息
-    page = st.sidebar.radio("選擇頁面", ["所有景點","私房遊程" ,"歷史訂單", "景點搜搜搜", "留言板"])
-    if page == "所有景點":
+    page = st.sidebar.radio("選擇頁面", ["首頁","測試頁", "私房遊程","所有景點", "歷史訂單", "景點搜搜搜", "留言板"])
+    if page == "首頁":
+        view_products()
+    elif page == "測試頁":
+        home()
+    elif page == "所有景點":
         popular_attractions()
     elif page == "私房遊程":
         private_tours()
@@ -111,21 +115,35 @@ def home():
     st.image("orders/Screenshot 2023-12-23 002157.png")
 
 
+# 景點總覽
+def view_products():
+    st.title("景點推薦")
 
-# buy_button 按鈕
-if "shopping_cart" not in st.session_state:
-    st.session_state.shopping_cart = []
-def buy_button(book_index):
-    if st.button(f"選取 {books.at[book_index, 'title']}", key=f"buy_button_{book_index}"):
-        if any(item['景點'] == books.at[book_index, 'title'] for item in st.session_state.shopping_cart):
-            st.warning("此景點已經加入景點搜搜搜")
-        else:
-            st.session_state.shopping_cart.append({
-                "景點": books.at[book_index, "title"],
-                "地區": books.at[book_index, "author"],
-                "類型": books.at[book_index, "genre"],  
-                        })
-            st.write(f"已將 {books.at[book_index, 'title']} 加入景點搜搜搜")
+    # 使用 st.beta_columns 將一行分為兩列
+    cols = st.columns(2)  # 新增
+    for i in range(0, min(6, len(books))):  # Display up to the first 6 entries
+        with cols[i % 2]:  # 新增
+            st.write(f"## {books.at[i, 'title']}")
+            st.image(books.at[i, "image"], caption=books.at[i, "title"], width=300)
+            st.write(f"**位置:** {books.at[i, 'author']}")
+            st.write(f"**類型:** {books.at[i, 'genre']}")
+            st.write(f"**金額:** {books.at[i, 'price']}")
+
+            quantity = st.number_input(f"購買數量 {i}", min_value=1, value=1, key=f"quantity_{i}")
+
+            if st.button(f"選取 {books.at[i, 'title']}", key=f"buy_button_{i}"):
+                if "shopping_cart" not in st.session_state:
+                    st.session_state.shopping_cart = []
+                st.session_state.shopping_cart.append({
+                    "title": books.at[i, "title"],
+                    "quantity": quantity,
+                    "total_price": int(books.at[i, 'price']) * int(quantity)  # Total price calculation
+                })
+                st.write(f"已將 {quantity} 本 {books.at[i, 'title']} 加入景點搜搜搜")
+
+        st.write("---")
+
+
 
 # 顯示訂單
 def display_order():
@@ -133,8 +151,7 @@ def display_order():
 
     # 顯示景點搜搜搜中的商品
     for item in st.session_state.shopping_cart:
-        st.write(f"{item['gender']} 本 {item['title']}")
-
+        st.write(f"{item['quantity']} 本 {item['title']}")
 
     # 顯示其他訂單相關資訊，例如總金額、訂單時間等
     total_expense = sum(item["total_price"] for item in st.session_state.shopping_cart)
@@ -146,20 +163,17 @@ def display_order():
 # 景點搜搜搜頁面
 def shopping_cart_page():
     st.title("景點搜搜搜")
-   
+    
     if not st.session_state.shopping_cart:
-        st.write("景點搜搜搜是空的，快去選有興趣的景點吧！")
+        st.write("景點搜搜搜是空的，快去選購您喜歡的書籍吧！")
     else:
         # Create a Pandas DataFrame from the shopping cart data
         df = pd.DataFrame(st.session_state.shopping_cart)
 
         # Display the DataFrame as a table
         st.table(df)
-        if st.button('重選景點'):
-            # Reset the shopping cart (delete the DataFrame)
-            st.session_state.shopping_cart = []
 
-        pay = st.button('Google導航')
+        pay = st.button('結帳')
 
         if pay:
             st.session_state.show_payment = True
@@ -190,15 +204,19 @@ def message_board():
     # 初始化 session_state
     if "past_messages" not in st.session_state:
         st.session_state.past_messages = []
+
     # 在應用程式中以對話框的形式顯示用戶消息
     with st.chat_message("user"):
         st.write("歡迎來到留言板！")
+
     # 接收用戶輸入
     prompt = st.text_input("在這裡輸入您的留言")
+
     # 如果用戶有輸入，則將留言加入 session_state 中
     if prompt:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         st.session_state.past_messages.append({"user": "user", "message": f"{timestamp} - {prompt}"})
+
     # 留言板中顯示過去的留言
     with st.expander("過去的留言"):
         # 顯示每條留言
@@ -217,93 +235,49 @@ def order_history():
     # 顯示表格
     st.table(df)
 
-
 # 所有景點頁面
 def popular_attractions():
     st.title("所有景點")
-
+    st.write("探索城市的所有景點！在這裡找到您感興趣的地方。")
+        
     # Get selected region and category from the sidebar
     cols = st.columns(2)
     with cols[0]:
-        selected_region = st.selectbox("景點地區", ["所有地區", "旗津海港", "駁二時尚", "鹽埕風格", "西子灣海風"], key="region_selector")
+        selected_region = st.selectbox("景點地區", ["旗津海港", "駁二時尚", "鹽埕風格", "西子灣海風"], key="region_selector")
     with cols[1]:
-        selected_category = st.selectbox("景點種類", ["所有種類", "美食介紹", "景點遊玩"], key="category_selector")
+        selected_category = st.selectbox("景點種類", ["美食介紹", "景點遊玩"], key="category_selector")
+    
+    # Filter books based on selected region and category
+    filtered_books = books[(books['author'] == selected_region) & (books['genre'] == selected_category)]
 
-    if selected_region == "所有地區" and selected_category == "所有種類":
-        st.subheader("所有景點")
-    # 使用 st.beta_columns 將一行分為兩列
-        cols = st.columns(2)  # 新增
-        for i in range(0, len(books)): 
-                with cols[i % 2]:  # 新增
-                    st.write(f"**{books.at[i, 'title']}**")
-                    st.image(books.at[i, "image"], caption=books.at[i, "title"], width=300)
-                    st.write(f"位置: {books.at[i, 'author']}")
-                    st.write(f"類型: {books.at[i, 'genre']}")
-                    buy_button(i)
-    else:
-        # 根據選擇的地區篩選數據
-        filtered_data = books if selected_region == "所有地區" else books[books["author"] == selected_region]
-        # 根據選擇的種類再次篩選數據
-        filtered_data = filtered_data if selected_category == "所有種類" else filtered_data[filtered_data["genre"] == selected_category]
-        # 輸出結果
+    # Display filtered books
+    st.write(f"篩選後的 {selected_region} 的 {selected_category} 景點:")
+    
+    # Iterate through filtered_books and display information
+    cols = st.columns(2)
+    for i in range(len(filtered_books)):
+        with cols[i % 2]:  
+            try:
+                st.write(f"## {filtered_books.at[i, 'title']}")
+                st.image(filtered_books.at[i, "image"], caption=filtered_books.at[i, "title"], width=300)  
+                st.write(f"**位置:** {filtered_books.at[i, 'author']}")
+                st.write(f"**類型:** {filtered_books.at[i, 'genre']}")
+                st.write(f"**金額:** {filtered_books.at[i, 'price']}")
+                
+                quantity = st.number_input(f"購買數量 {i}", min_value=1, value=1, key=f"quantity_{i}")
 
-        cols = st.columns(2)  # 新增
-        for i, (_, row) in enumerate(filtered_data.iterrows()):  # Iterate over rows in filtered_data
-            with cols[i % 2]:  # Switch columns for each iteration
-                titlename = st.write(f"**{row['title']}**")
-                st.image(row["image"], width=300)
-                st.write(f"位置: {row['author']}")
-                st.write(f"類型: {row['genre']}")
-                        # 使用 buy_button 函數處理按鈕邏輯
-                titlename = row['title']
-                if st.button(f"選取 {titlename}", key=f"buy_button_{i}"):
-                    if any(item['景點'] == titlename for item in st.session_state.shopping_cart):
-                        st.warning("此景點已經加入景點搜搜搜")
-                    else:
-                        st.session_state.shopping_cart.append({
-                            "景點": row["title"],
-                            "地區": row["author"],
-                            "類型": row["genre"],  
-                        })
-                        st.write(f"已將 {row['title']} 加入景點搜搜搜")
+                if st.button(f"選取 {filtered_books.at[i, 'title']}", key=f"buy_button_{i}"):
+                    # Add selected book to shopping cart or perform any other action
+                    st.write(f"已將 {quantity} 本 {filtered_books.at[i, 'title']} 加入景點搜搜搜")
 
+                st.write("---")
+            except KeyError:
+                pass  #沒有索引就略過
+# 私房遊程頁面
 def private_tours():
     st.title("私房遊程")
     st.write("尋找獨特的私房遊程，打造屬於您的旅程！")
-    # 使用 st.container 創建一個容器
-    with st.container():
-    # 在容器內部顯示文字
-    
 
-    # 使用 st.columns 分割容器為三列，分別賦值給 col1, col2, col3
-        col1, col2, col3 = st.columns(3)
-
-    # 在第一列（col1）顯示鹽埕區半日遊的圖片跟簡短介紹
-    with col1:
-        st.header("半日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#鹽埕區#駁二特區")
-        st.markdown("高雄市鹽埕區的駁二特區是充滿藝術與文化魅力的地方。\
-                    這裡也有許多藝術裝置和彩繪壁畫，適合藝術愛好者漫步欣賞。\
-                    鹽埕埔碼頭是個享受海洋氛圍和美食的好地方，可以品嚐新鮮的海鮮小吃。") 
-
-    # 在第二列（col2）顯示三民區半日遊的圖片跟簡短介紹
-    with col2:
-        st.header("半日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#三民區#美食")
-        st.markdown("三民區在高雄是個精彩的旅遊地點，以多樣美食和獨特景點吸引遊客。\
-                    漢神巨蛋是主要地標，還有民族路夜市、大東夜市等美食天堂，提供各式美味小吃。想品味在地特色美食，這裡是最佳選擇。\
-                    在文化和美食上都充滿了活力和驚喜。") 
-
-    # 在第三列（col3）顯示旗津全日遊的圖片跟簡短介紹
-    with col3:
-        st.header("全日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#旗津#渡船遊程")
-        st.markdown("乘坐渡船遊覽旗津是一場美妙的海上冒險。\
-                    從高雄港出發，乘船徜徉在湛藍海岸線上，欣賞著美麗的海景和遠眺港都高樓群，探索當地特色美食、漁港和沙灘。\
-                    最令人難忘的是在海上感受到的清新涼風和放鬆的氛圍，這趟航程將帶給你難忘的海上體驗。 ")
 
 
 def main():
