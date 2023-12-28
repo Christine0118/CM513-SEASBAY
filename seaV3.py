@@ -111,21 +111,33 @@ def home():
     st.image("orders/Screenshot 2023-12-23 002157.png")
 
 
+ 
 
-# buy_button 按鈕
-if "shopping_cart" not in st.session_state:
-    st.session_state.shopping_cart = []
 def buy_button(book_index):
-    if st.button(f"選取 {books.at[book_index, 'title']}", key=f"buy_button_{book_index}"):
-        if any(item['景點'] == books.at[book_index, 'title'] for item in st.session_state.shopping_cart):
-            st.warning("此景點已經加入景點搜搜搜")
-        else:
+    titlename = books.at[book_index, 'title']
+    is_selected = any(item['景點'] == titlename for item in st.session_state.shopping_cart)
+
+    if is_selected:
+        if st.button(f"取消選取 {titlename}", key=f"cancel_button_{book_index}"):
+            st.session_state.shopping_cart = [item for item in st.session_state.shopping_cart if item['景點'] != titlename]
+            st.write(f"已取消選取 {titlename}")
+            st.experimental_rerun()  # 重新渲染頁面
+    else:
+        if st.button(f"選取 {titlename}", key=f"buy_button_{book_index}"):
             st.session_state.shopping_cart.append({
                 "景點": books.at[book_index, "title"],
                 "地區": books.at[book_index, "author"],
                 "類型": books.at[book_index, "genre"],  
-                        })
-            st.write(f"已將 {books.at[book_index, 'title']} 加入景點搜搜搜")
+            })
+            st.write(f"已將 {titlename} 加入景點搜搜搜")
+            st.experimental_rerun()  # 重新渲染頁面
+
+
+
+
+
+
+
 
 # 顯示訂單
 def display_order():
@@ -158,6 +170,8 @@ def shopping_cart_page():
         if st.button('重選景點'):
             # Reset the shopping cart (delete the DataFrame)
             st.session_state.shopping_cart = []
+            st.experimental_rerun()#重新刷新頁面
+            
 
         pay = st.button('Google導航')
 
