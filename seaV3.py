@@ -7,6 +7,8 @@ from yaml.loader import SafeLoader
 import copy
 import os
 import json
+import numpy as np
+import webbrowser
 
 
 # 讀取設定檔
@@ -112,7 +114,7 @@ def home():
 
 
  
-
+#購買按鈕
 def buy_button(book_index):
     titlename = books.at[book_index, 'title']
     is_selected = any(item['景點'] == titlename for item in st.session_state.shopping_cart)
@@ -132,18 +134,9 @@ def buy_button(book_index):
             st.write(f"已將 {titlename} 加入景點搜搜搜")
             st.experimental_rerun()  # 重新渲染頁面
 
-
-
-
-
-
-
-
-
 # 顯示訂單
 def display_order():
     st.title("訂單明細")
-
     # 顯示景點搜搜搜中的商品
     for item in st.session_state.shopping_cart:
         st.write(f"{item['gender']} 本 {item['title']}")
@@ -159,46 +152,54 @@ def display_order():
 # 景點搜搜搜頁面
 def shopping_cart_page():
     st.title("景點搜搜搜")
-   
+       
     if not st.session_state.shopping_cart:
         st.write("景點搜搜搜是空的，快去選有興趣的景點吧！")
     else:
         # Create a Pandas DataFrame from the shopping cart data
+        st.subheader("景點安排")
         df = pd.DataFrame(st.session_state.shopping_cart)
-
+        
         # Display the DataFrame as a table
         st.table(df)
+
         if st.button('重選景點'):
             # Reset the shopping cart (delete the DataFrame)
             st.session_state.shopping_cart = []
             st.experimental_rerun()#重新刷新頁面
-            
 
-        pay = st.button('Google導航')
 
-        if pay:
-            st.session_state.show_payment = True
-        if 'show_payment' in st.session_state and st.session_state.show_payment:
-            Payment_page()
+        Payment_page(st.session_state.shopping_cart)
+#google map 規劃路線
+def generate_google_maps_link(latitude, longitude):
+    return f'https://www.google.com/maps?q={latitude},{longitude}'
+
+def open_google_maps(latitude, longitude):
+    google_maps_link = generate_google_maps_link(latitude, longitude)
+    webbrowser.open_new_tab(google_maps_link)
 
 
 # 結帳頁面
-def Payment_page():
-    st.title("結帳")
-    with st.form(key="購物清單") as form:
-        購買詳情 = display_order()
-        付款方式 = st.selectbox('請選擇付款方式', ['信用卡', 'Line Pay'])
-        優惠碼 = st.text_input('優惠代碼')
-        寄送方式 = st.selectbox('請選擇寄送方式', ['寄送到府', '寄送至指定便利商店'])
-        
-        submitted = st.form_submit_button("確認付款")
-        
-    if submitted:
-        order_history_df = pd.DataFrame(st.session_state.shopping_cart)
-            # 保存用戶訂單歷史
-        save_user_order_history(st.session_state.user_info["name"], order_history_df)
-        st.session_state.shopping_cart = []
-        st.write("交易成功！")
+def Payment_page(shopping_cart):
+    st.subheader("景點地圖")
+    all_map_data = []    
+    # Collect map data for all locations
+    for item in shopping_cart:
+        location_name = item["景點"] 
+        matching_book = books[books['title'] == location_name].iloc[0]
+        lat, lon = matching_book['lat'], matching_book['lon']
+        location_data = [lat, lon, location_name]
+        all_map_data.append(location_data)
+
+    # Display all locations on the same map
+    if all_map_data:
+        all_map_data.append([22.62492385821083, 120.2648231633996, "西子灣沙灘會館"])
+        map_df = pd.DataFrame(all_map_data, columns=['lat', 'lon', 'location_name'])
+        st.map(map_df,size=50, use_container_width=True )
+    if st.button("開啟 Google 地圖:西子灣沙灘會館"):
+        # 用于示例的经度和纬度坐标
+        latitude, longitude = 22.62492385821083, 120.2648231633996
+        open_google_maps(latitude, longitude)
 
 # 留言頁
 def message_board():
@@ -282,6 +283,7 @@ def popular_attractions():
                         })
                         st.write(f"已將 {row['title']} 加入景點搜搜搜")
 
+#私房景點
 def private_tours():
     st.title("私房遊程")
     st.write("尋找獨特的私房遊程，打造屬於您的旅程！")
@@ -307,15 +309,16 @@ def private_tours():
         st.header("半日遊")
         st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
         st.write("#三民區#美食")
+        st.image("orders/Screenshot 2023-12-23 002157.png")
         st.markdown("三民區在高雄是個精彩的旅遊地點，以多樣美食和獨特景點吸引遊客。\
                     漢神巨蛋是主要地標，還有民族路夜市、大東夜市等美食天堂，提供各式美味小吃。想品味在地特色美食，這裡是最佳選擇。\
                     在文化和美食上都充滿了活力和驚喜。") 
 
     # 在第三列（col3）顯示旗津全日遊的圖片跟簡短介紹
     with col3:
-        st.header("全日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#旗津#渡船遊程")
+        st.header("全日遊")    
+        st.image("orders/西子灣-景點-夕照觀景坡堤.jpg")
+        st.write("#西子灣&駁二")
         st.markdown("乘坐渡船遊覽旗津是一場美妙的海上冒險。\
                     從高雄港出發，乘船徜徉在湛藍海岸線上，欣賞著美麗的海景和遠眺港都高樓群，探索當地特色美食、漁港和沙灘。\
                     最令人難忘的是在海上感受到的清新涼風和放鬆的氛圍，這趟航程將帶給你難忘的海上體驗。 ")
