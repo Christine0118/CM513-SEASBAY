@@ -293,36 +293,49 @@ def private_tours():
     
 
     # 使用 st.columns 分割容器為三列，分別賦值給 col1, col2, col3
-        col1, col2, col3 = st.columns(3)
+
 
     # 在第一列（col1）顯示鹽埕區半日遊的圖片跟簡短介紹
-    with col1:
-        st.header("半日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#鹽埕區#駁二特區")
-        st.markdown("高雄市鹽埕區的駁二特區是充滿藝術與文化魅力的地方。\
-                    這裡也有許多藝術裝置和彩繪壁畫，適合藝術愛好者漫步欣賞。\
-                    鹽埕埔碼頭是個享受海洋氛圍和美食的好地方，可以品嚐新鮮的海鮮小吃。") 
 
+        st.header("一日遊")
+        st.subheader("鹽埕風格的美食與景點探索")
+        st.image("orders\鹽埕-景點-文武聖殿.jpg")
+        st.write("上午")
+        st.markdown(" 前往參拜「文武聖殿」，這是一座具有悠久歷史的廟宇，充滿宗教文化氛圍。在這裡，你可以感受到當地居民的信仰和傳統。") 
+        with st.expander("繼續閱讀"):    
+            st.image("orders\鹽埕-景點-高雄市立歷史博物館.jpg")
+            st.markdown("前往參觀「高雄市立歷史博物館」，深入了解高雄市的豐富歷史。博物館展示了許多珍貴的文物和歷史資料，是一個了解城市發展的絕佳場所。")
+            st.image("orders\鹽埕-美食-港園牛肉麵.jpg")
+            st.markdown("來到鹽埕風格區的「港園牛肉麵」。這家餐廳以濃郁的牛肉湯底和彈牙的麵條聞名，是當地的美食代表之一。品嚐一碗熱騰騰的牛肉麵，開啟美好的一天。")
+            st.image("orders\鹽埕-景點-高雄市電影館.jpg")
+            st.markdown("隨後，探訪「高雄市電影館」，這裡是影視愛好者的天堂。不僅有豐富的電影放映，還有特展和活動，讓你沉浸在電影的世界中。")
+            st.image("orders\鹽埕-景點-愛河親水徒步區.jpg")
+            st.markdown("漫步「愛河親水徒步區」，欣賞愛河風光。這裡有美麗的河畔風景、悠閒的散步道，讓你放鬆心情，感受愛河的浪漫氛圍。")
     # 在第二列（col2）顯示三民區半日遊的圖片跟簡短介紹
-    with col2:
+
         st.header("半日遊")
-        st.image("https://s3-alpha-sig.figma.com/img/152b/406a/1a0e94e7a9c64f497bdd72615b2568d2?Expires=1704067200&Signature=hGOM2q7F2ObaczZ5E26wBxXMbdFhesgJLR0pbknF3hyI8ft0a72ZglpKQ408~8Gg~clBh-IaaEFcATTJoFa6w7a4X9-k--W53oJND1vkgKTwn0tsjsaIOAuohTl3AYm89I~x7XblQBrDR2e-Yp7z4J20QeCTQturkAfIsc3BSyyUSU-bWwdMQHj651uoZSD04GtM2ODhG3bXOCSq6s9DjDJoTYw1y3kjwFU8VxD9j3oqe3NolB3j2IcCsuQ2ePcFa1s~bIFm9pwuxCi22jqE2nxcE1s0ASVU8b6o3FzERTWgYVOCPqbczCCTJ1TIfJJKHBKxUtXCcZlAxY5j8Jtg3Q__&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4")
-        st.write("#三民區#美食")
-        st.image("orders/Screenshot 2023-12-23 002157.png")
-        st.markdown("三民區在高雄是個精彩的旅遊地點，以多樣美食和獨特景點吸引遊客。\
-                    漢神巨蛋是主要地標，還有民族路夜市、大東夜市等美食天堂，提供各式美味小吃。想品味在地特色美食，這裡是最佳選擇。\
-                    在文化和美食上都充滿了活力和驚喜。") 
-
+        st.subheader("西子灣美食與自然探險")
+        st.image("orders\西子灣-美食-鴨肉珍.jpg")
+        st.write("下午：")
+        st.markdown(" 開啟你的半日遊行程，首先在木葉粗食品嚐當地特色的粗食料理。這家餐廳以木葉為名，營造出自然、清新的用餐環境。你可以品嚐到新鮮、簡單而美味的台灣傳統料理，感受當地飲食文化的精髓。") 
+        with st.expander("繼續閱讀"):    
+            st.image("orders\西子灣-景點-打狗英國領事館文化園區.jpg")
+            st.markdown("前往打狗英國領事館文化園區，這是一個融合歷史、文化和藝術的地方。在這裡，你可以漫遊於保存完整的英國領事館建築中，了解高雄的歷史背景。文化園區也經常舉辦各種藝術展覽和文化活動，為遊客提供多元的體驗。")
+            st.image("orders\西子灣-景點-夕照觀景坡堤.jpg")
+            st.markdown("午後時光，前往夕照觀景坡堤，這裡是西子灣海風的最佳觀景點之一。站在坡堤上，你可以俯瞰整個西子灣，欣賞到海天一色的美景，特別是在夕陽西下的時刻，風景更是令人陶醉。攜帶相機，記錄下這片美麗的風光。")
+            st.markdown("這趟半日遊行程結合了美食、自然和文化，讓你在西子灣海風中度過一個豐富而難忘的時光。")
     # 在第三列（col3）顯示旗津全日遊的圖片跟簡短介紹
-    with col3:
-        st.header("全日遊")    
-        st.image("orders/西子灣-景點-夕照觀景坡堤.jpg")
-        st.write("#西子灣&駁二")
-        st.markdown("乘坐渡船遊覽旗津是一場美妙的海上冒險。\
-                    從高雄港出發，乘船徜徉在湛藍海岸線上，欣賞著美麗的海景和遠眺港都高樓群，探索當地特色美食、漁港和沙灘。\
-                    最令人難忘的是在海上感受到的清新涼風和放鬆的氛圍，這趟航程將帶給你難忘的海上體驗。 ")
 
+        st.header("半日遊")
+        st.subheader("駁二時尚藝術與美食探險")
+        st.image("orders\駁二-景點- 金馬賓館當代美術館.jpg")
+        st.markdown(" 開啟你的半日遊行程，首先參觀「金馬賓館當代美術館」，這座當代藝術館位於駁二時尚區，展示著豐富的藝術收藏品。在這裡，你可以欣賞到來自不同藝術家的作品，感受當代藝術的獨特魅力。") 
+        with st.expander("繼續閱讀"):
+            st.image("orders\駁二-景點-哈瑪星鐵道文化園區.jpg")
+            st.markdown("隨後前往「哈瑪星鐵道文化園區」，這個充滿歷史氛圍的地方曾經是一座火車站，現在轉變成文化園區。在這裡，你可以探索保存完好的鐵道建築，了解高雄的鐵道歷史。")
+            st.image("orders\駁二-美食-紅瀰.jpg")
+            st.markdown("午後時光，前往夕照觀景坡堤，這裡是西子灣海風的最佳觀景點之一。站在坡堤上，你可以俯瞰整個西子灣，欣賞到海天一色的美景，特別是在夕陽西下的時刻，風景更是令人陶醉。攜帶相機，記錄下這片美麗的風光。")
+            st.markdown("這趟半日遊行程結合了美食、自然和文化，讓你在西子灣海風中度過一個豐富而難忘的時光。")
 
 def main():
     
