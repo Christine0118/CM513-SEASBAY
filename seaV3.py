@@ -63,6 +63,7 @@ def save_user_order_history(username, current_orders):
     else:
         # 如果檔案不存在，則創建新的 DataFrame
         updated_orders = pd.DataFrame(current_orders)
+
     
     # 保存更新後的訂單歷史
     updated_orders.to_csv(order_history_file, index=False)
@@ -71,12 +72,12 @@ def save_user_order_history(username, current_orders):
 
 def login_page():
     # 在登入頁面以對話框的形式顯示用戶消息
-    page = st.sidebar.radio("選擇頁面", ["所有景點","私房遊程" ,"歷史訂單", "景點搜搜搜", "留言板"])
+    page = st.sidebar.radio("選擇頁面", ["所有景點","私房遊程" ,"歷史景點", "景點搜搜搜", "留言板"])
     if page == "所有景點":
         popular_attractions()
     elif page == "私房遊程":
         private_tours()
-    elif page == "歷史訂單":
+    elif page == "歷史景點":
         order_history()
     elif page == "景點搜搜搜":
         shopping_cart_page()
@@ -199,6 +200,8 @@ def Payment_page(shopping_cart):
     if st.button("開啟 Google 地圖:西子灣沙灘會館"):
         # 用于示例的经度和纬度坐标
         latitude, longitude = 22.62492385821083, 120.2648231633996
+        order_history_df = pd.DataFrame(st.session_state.shopping_cart)
+        save_user_order_history(st.session_state.user_info["name"], order_history_df)
         open_google_maps(latitude, longitude)
 
 # 留言頁
@@ -226,12 +229,18 @@ def message_board():
 
 # 訂單歷史頁面
 def order_history():
-    st.title("訂單歷史")
+    st.title("景點歷史")
     # 將訂單資料轉換為 DataFrame
     df = load_user_order_history(st.session_state.user_info["name"])
-
     # 顯示表格
     st.table(df)
+    if st.button('刪除景點'):
+        # 刪除整個 DataFrame
+        df.drop(df.index, inplace=True)
+        
+        # 將刪除後的 DataFrame 保存到文件
+        order_history_file = f"{orders_path}/{st.session_state.user_info['name']}.csv"
+        df.to_csv(order_history_file, index=False)
 
 
 # 所有景點頁面
